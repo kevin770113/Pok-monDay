@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>7/26 GO Fest 終極戰術面板 (戶外實戰版)</title>
+    <style>
+        :root {
+            --mystic-blue: #0055FF;
+            --valor-red: #FF3333;
+            --instinct-yellow: #FFCC00;
+            
+            --bg-dark: #121212;
+            --bg-card: #222;
+            --bg-modal: #1A1A1A;
+            --text-main: #FFF;
+            --safe-bottom: 20px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 頂部列：動態背景色與陰影 */
+        header {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(18, 18, 18, 0.92); backdrop-filter: blur(10px);
+            z-index: 100; padding: 12px 15px;
+            border-bottom: 3px solid #444;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            transition: background-color 0.5s, border-color 0.5s;
+        }
+        .time-label { font-size: 13px; color: #CCC; font-weight: bold; }
+        .clock { font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; color: #FFF; }
+
+        /* 主內容區 */
+        main { 
+            flex: 1; padding: 75px 12px 120px 12px; 
+            overflow-y: auto; 
+        }
+
+        .section-title {
+            font-size: 18px; font-weight: 900; margin: 24px 0 12px;
+            padding-left: 10px; border-left: 5px solid #FFF;
+        }
+
+        /* 卡片網格 */
+        .boss-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .boss-grid.others { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .boss-card {
+            background-color: var(--bg-card); border-radius: 12px;
+            padding: 16px; border: 1px solid #333;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+        
+        .boss-card.highlight::before {
+            content: '⭐ 絕對必打 / Must Do';
+            position: absolute; top: 0; left: 0; width: 100%;
+            font-size: 11px; font-weight: bold; text-align: center;
+            padding: 4px 0; background: rgba(255,255,255,0.15);
+        }
+        .boss-card.highlight { padding-top: 30px; border-width: 2px; }
+
+        .boss-name { font-size: 20px; font-weight: 900; line-height: 1.2; }
+        .boss-en { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .boss-card.others .boss-name { font-size: 16px; }
+
+        /* 屬性標籤 */
+        .type-pill {
+            display: inline-block; padding: 4px 10px; border-radius: 6px;
+            font-size: 13px; font-weight: 900; margin-right: 6px; color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+        }
+        .type-psychic { background-color: #F85888; }
+        .type-dragon { background-color: #7038F8; }
+        .type-steel { background-color: #B8B8D0; }
+        .type-water { background-color: #6890F0; }
+        .type-electric { background-color: #F8D030; }
+        .type-fighting { background-color: #C03028; }
+        .type-dark { background-color: #705848; }
+        .type-rock { background-color: #B8A038; }
+        .type-bug { background-color: #A8B820; }
+        .type-ghost { background-color: #705898; }
+        .type-ground { background-color: #E0C068; }
+        .type-fire { background-color: #F08030; }
+        .type-ice { background-color: #98D8D8; }
+        .type-poison { background-color: #A040A0; }
+        .type-fairy { background-color: #EE99AC; }
+
+        /* 彈出視窗 (Modal) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: flex-end;
+            z-index: 200;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-content {
+            background: var(--bg-modal); width: 100%; max-height: 90vh;
+            border-radius: 20px 20px 0 0; padding: 20px 20px 0 20px;
+            display: flex; flex-direction: column;
+            animation: slideUp 0.25s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .modal-header { border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 15px; position: relative; flex-shrink: 0; }
+        .m-title { font-size: 24px; font-weight: 900; }
+        .m-en { font-size: 14px; color: #999; margin-top: 2px; }
+        .close-btn {
+            position: absolute; right: 0; top: 0;
+            background: #444; color: white; border: none;
+            width: 36px; height: 36px; border-radius: 18px; font-size: 18px; font-weight: bold;
+        }
+
+        .modal-scroll-area {
+            overflow-y: auto;
+            flex: 1;
+            padding-bottom: 30px;
+        }
+
+        .attr-container {
+            display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;
+        }
+        .attr-box { padding: 12px; border-radius: 8px; }
+        .attr-box.type { background: rgba(255,255,255,0.08); border-left: 5px solid #888; }
+        .attr-box.weak { background: rgba(255, 51, 51, 0.15); border-left: 5px solid #FF3333; }
+        .attr-title { font-size: 13px; font-weight: 900; margin-bottom: 8px; }
+        .attr-title.type { color: #DDD; }
+        .attr-title.weak { color: #FF5555; }
+
+        .split-view {
+            display: flex; gap: 10px; 
+            min-height: min-content;
+        }
+        .col { flex: 1; border-radius: 8px; padding: 10px; height: max-content; }
+        .col-good { background: rgba(0, 200, 83, 0.1); border-top: 4px solid #00C853; }
+        .col-bad { background: rgba(229, 57, 53, 0.1); border-top: 4px solid #E53935; }
+        
+        .col-title { font-size: 15px; font-weight: 900; text-align: center; margin-bottom: 12px; }
+        .col-good .col-title { color: #00C853; }
+        .col-bad .col-title { color: #E53935; }
+
+        .poke-item {
+            background: rgba(0,0,0,0.4); border-radius: 6px;
+            padding: 10px 8px; margin-bottom: 8px; text-align: center;
+        }
+        .poke-item:last-child { margin-bottom: 0; }
+        .poke-tw { font-size: 14px; font-weight: 900; margin-bottom: 2px; }
+        .poke-en { font-size: 11px; color: #AAA; }
+        
+        /* 底部導覽列 */
+        nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: #111; display: flex;
+            padding-bottom: var(--safe-bottom); border-top: 1px solid #333; z-index: 100;
+        }
+        .nav-item {
+            flex: 1; text-align: center; padding: 15px 0;
+            color: #555; font-size: 15px; font-weight: 900;
+            transition: all 0.2s; border-top: 4px solid transparent;
+        }
+        .nav-time { font-size: 18px; font-weight: 900; display: block; margin-bottom: 4px; }
+
+        .nav-item.active-mystic { color: var(--mystic-blue); border-color: var(--mystic-blue); background: rgba(0,85,255,0.15); }
+        .nav-item.active-valor { color: var(--valor-red); border-color: var(--valor-red); background: rgba(255,51,51,0.15); }
+        .nav-item.active-instinct { color: var(--instinct-yellow); border-color: var(--instinct-yellow); background: rgba(255,204,0,0.15); }
+        
+    </style>
+</head>
+<body>
+
+    <header id="top-header">
+        <span class="time-label">當前時間</span>
+        <span class="clock" id="clock">00:00:00</span>
+    </header>
+
+    <main id="content"></main>
+
+    <nav>
+        <div class="nav-item active-mystic" onclick="switchTab('p1')" id="tab-p1">
+            <span class="nav-time">10:00</span>廣闊大地
+        </div>
+        <div class="nav-item" onclick="switchTab('p2')" id="tab-p2">
+            <span class="nav-time">13:00</span>耀眼翠綠
+        </div>
+        <div class="nav-item" onclick="switchTab('p3')" id="tab-p3">
+            <span class="nav-time">16:00</span>黃昏對戰
+        </div>
+    </nav>
+
+    <!-- Modal 彈出視窗 -->
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <button class="close-btn" onclick="closeModal(true)">✕</button>
+                <div class="m-title" id="m-title">頭目名稱</div>
+                <div class="m-en" id="m-en">Boss English Name</div>
+            </div>
+            
+            <div class="modal-scroll-area">
+                <div class="attr-container">
+                    <div class="attr-box type">
+                        <div class="attr-title type">🎯 主屬性 (Types)</div>
+                        <div id="m-types"></div>
+                    </div>
+                    <div class="attr-box weak">
+                        <div class="attr-title weak">⚠️ 弱點 (Weaknesses)</div>
+                        <div id="m-weaks"></div>
+                    </div>
+                </div>
+
+                <div class="split-view">
+                    <div class="col col-good">
+                        <div class="col-title">✅ 推薦打手<br><span style="font-size:11px;">(前 10 名最佳)</span></div>
+                        <div id="m-good-list"></div>
+                    </div>
+                    <div class="col col-bad">
+                        <div class="col-title">❌ 嚴禁上場<br><span style="font-size:11px;">(系統常推的雷包)</span></div>
+                        <div id="m-bad-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 動態時鐘與「頂部列底色自動變色」系統
+        function updateClock() {
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            
+            document.getElementById('clock').textContent = 
+                String(h).padStart(2, '0') + ':' + 
+                String(m).padStart(2, '0') + ':' + 
+                String(s).padStart(2, '0');
+
+            // 判斷是否為週日活動日 (假設 7/26 日期，若平時測試可拔除日期限制，此處僅做簡易時段判斷)
+            // 這裡直接依據當前時間點自動變換頂部列底色
+            const header = document.getElementById('top-header');
+            
+            // 模擬：如果剛好在活動時間範圍內 (假設 10:00 ~ 19:00)
+            if (h >= 10 && h < 13) {
+                header.style.backgroundColor = 'rgba(0, 85, 255, 0.35)'; // 藍色基調
+                header.style.borderColor = 'var(--mystic-blue)';
+            } else if (h >= 13 && h < 16) {
+                header.style.backgroundColor = 'rgba(255, 51, 51, 0.35)'; // 紅色基調
+                header.style.borderColor = 'var(--valor-red)';
+            } else if (h >= 16 && h < 19) {
+                header.style.backgroundColor = 'rgba(255, 204, 0, 0.35)'; // 黃色基調
+                header.style.borderColor = 'var(--instinct-yellow)';
+            } else {
+                header.style.backgroundColor = 'rgba(18, 18, 18, 0.92)'; // 非活動時間為沉穩黑色
+                header.style.borderColor = '#444';
+            }
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // 2. 資料庫
+        const db = {
+            "超級超夢 Y": {
+                en: "Mega Mewtwo Y",
+                types: [{n:"超能力",c:"type-psychic"}], weaks: [{n:"惡",c:"type-dark"},{n:"幽靈",c:"type-ghost"},{n:"蟲",c:"type-bug"}],
+                good: [{t:"超級班基拉斯",e:"Mega Tyranitar"},{t:"超級大針蜂",e:"Mega Beedrill"},{t:"超級黑魯加",e:"Mega Houndoom"},{t:"瑪狃拉",e:"Weavile"},{t:"達克萊伊",e:"Darkrai"},{t:"三首惡龍",e:"Hydreigon"},{t:"騎拉帝納(起源)",e:"Giratina (Origin)"},{t:"水晶燈火靈",e:"Chandelure"},{t:"伊裴爾塔爾",e:"Yveltal"},{t:"索羅亞克",e:"Zoroark"}],
+                bad: [{t:"怪力",e:"Machamp (被雙倍剋)"},{t:"耿鬼",e:"Gengar (毒系被剋)"},{t:"波士可多拉",e:"Aggron (無傷害)"},{t:"幸福蛋",e:"Blissey (拖時間)"}]
+            },
+            "帝牙盧卡 (起源)": {
+                en: "Dialga (Origin Forme)",
+                types: [{n:"鋼",c:"type-steel"},{n:"龍",c:"type-dragon"}], weaks: [{n:"格鬥",c:"type-fighting"},{n:"地面",c:"type-ground"}],
+                good: [{t:"超級路卡利歐",e:"Mega Lucario"},{t:"原始固拉多",e:"Primal Groudon"},{t:"超級赫拉克羅斯",e:"Mega Heracross"},{t:"怪力",e:"Machamp"},{t:"龍頭地鼠",e:"Excadrill"},{t:"路卡利歐",e:"Lucario"},{t:"修建老匠",e:"Conkeldurr"},{t:"固拉多",e:"Groudon"},{t:"土地雲(靈獸)",e:"Landorus"},{t:"鐵掌力士",e:"Hariyama"}],
+                bad: [{t:"烈空坐",e:"Rayquaza (被龍剋)"},{t:"快龍",e:"Dragonite (撐不住)"},{t:"洛奇亞",e:"Lugia (刮痧)"},{t:"請假王",e:"Slaking (雷包)"}]
+            },
+            "帕路奇亞 (起源)": {
+                en: "Palkia (Origin Forme)",
+                types: [{n:"水",c:"type-water"},{n:"龍",c:"type-dragon"}], weaks: [{n:"龍",c:"type-dragon"},{n:"妖精",c:"type-fairy"}],
+                good: [{t:"超級烈空坐",e:"Mega Rayquaza"},{t:"超級暴飛龍",e:"Mega Salamence"},{t:"超級烈咬陸鯊",e:"Mega Garchomp"},{t:"烈空坐",e:"Rayquaza"},{t:"帕路奇亞",e:"Palkia"},{t:"捷克羅姆",e:"Zekrom"},{t:"哲爾尼亞斯",e:"Xerneas"},{t:"波克基斯",e:"Togekiss"},{t:"快龍",e:"Dragonite"},{t:"超級沙奈朵",e:"Mega Gardevoir"}],
+                bad: [{t:"噴火龍",e:"Charizard (被水剋)"},{t:"原始蓋歐卡",e:"Primal Kyogre (水打水無力)"},{t:"波士可多拉",e:"Aggron (被水剋)"}]
+            },
+            "奈克洛茲瑪": {
+                en: "Necrozma",
+                types: [{n:"超能力",c:"type-psychic"}], weaks: [{n:"惡",c:"type-dark"},{n:"幽靈",c:"type-ghost"},{n:"蟲",c:"type-bug"}],
+                good: [{t:"超級班基拉斯",e:"Mega Tyranitar"},{t:"超級耿鬼",e:"Mega Gengar"},{t:"超級黑魯加",e:"Mega Houndoom"},{t:"瑪狃拉",e:"Weavile"},{t:"達克萊伊",e:"Darkrai"},{t:"三首惡龍",e:"Hydreigon"},{t:"騎拉帝納(起源)",e:"Giratina (Origin)"},{t:"水晶燈火靈",e:"Chandelure"},{t:"伊裴爾塔爾",e:"Yveltal"},{t:"賽富豪",e:"Gholdengo"}],
+                bad: [{t:"路卡利歐",e:"Lucario (被超剋)"},{t:"毒刺水母",e:"Tentacruel (被超剋)"},{t:"幸福蛋",e:"Blissey (完全沒輸出)"}]
+            },
+            "電束木": {
+                en: "Xurkitree",
+                types: [{n:"電",c:"type-electric"}], weaks: [{n:"地面",c:"type-ground"}],
+                good: [{t:"原始固拉多",e:"Primal Groudon"},{t:"超級烈咬陸鯊",e:"Mega Garchomp"},{t:"固拉多",e:"Groudon"},{t:"烈咬陸鯊",e:"Garchomp"},{t:"龍頭地鼠",e:"Excadrill"},{t:"土地雲(靈獸)",e:"Landorus"},{t:"超甲狂犀",e:"Rhyperior"},{t:"泥偶巨人",e:"Golurk"},{t:"象牙豬",e:"Mamoswine"},{t:"頓甲",e:"Donphan"}],
+                bad: [{t:"蓋歐卡",e:"Kyogre (被電慘剋)"},{t:"暴鯉龍",e:"Gyarados (雙倍弱電)"},{t:"比雕",e:"Pidgeot (空戰找死)"}]
+            },
+            "超級路卡利歐": {
+                en: "Mega Lucario",
+                types: [{n:"格鬥",c:"type-fighting"},{n:"鋼",c:"type-steel"}], weaks: [{n:"火",c:"type-fire"},{n:"格鬥",c:"type-fighting"},{n:"地面",c:"type-ground"}],
+                good: [{t:"原始固拉多",e:"Primal Groudon"},{t:"超級噴火龍Y",e:"Mega Charizard Y"},{t:"超級火焰雞",e:"Mega Blaziken"},{t:"萊希拉姆",e:"Reshiram"},{t:"代拉基翁",e:"Terrakion"},{t:"怪力",e:"Machamp"},{t:"固拉多",e:"Groudon"},{t:"達摩狒狒",e:"Darmanitan"},{t:"水晶燈火靈",e:"Chandelure"},{t:"烈咬陸鯊",e:"Garchomp"}],
+                bad: [{t:"班基拉斯",e:"Tyranitar (被格鬥4倍剋)"},{t:"請假王",e:"Slaking (被格鬥暴打)"},{t:"波士可多拉",e:"Aggron (被格鬥4倍剋)"}]
+            },
+            "超級班基拉斯": {
+                en: "Mega Tyranitar",
+                types: [{n:"岩石",c:"type-rock"},{n:"惡",c:"type-dark"}], weaks: [{n:"格鬥",c:"type-fighting"}],
+                good: [{t:"超級路卡利歐",e:"Mega Lucario"},{t:"超級火焰雞",e:"Mega Blaziken"},{t:"超級赫拉克羅斯",e:"Mega Heracross"},{t:"代拉基翁",e:"Terrakion"},{t:"怪力",e:"Machamp"},{t:"修建老匠",e:"Conkeldurr"},{t:"路卡利歐",e:"Lucario"},{t:"鐵掌力士",e:"Hariyama"},{t:"毒骷蛙",e:"Toxicroak"},{t:"蚊香泳士",e:"Poliwrath"}],
+                bad: [{t:"超夢",e:"Mewtwo (被惡剋死)"},{t:"洛奇亞",e:"Lugia (被岩石砸爛)"},{t:"耿鬼",e:"Gengar (被惡系秒殺)"}]
+            },
+            "雷吉洛克": {
+                en: "Regirock", types: [{n:"岩石",c:"type-rock"}], weaks: [{n:"水",c:"type-water"},{n:"草",c:"type-grass"},{n:"格鬥",c:"type-fighting"}],
+                good: [{t:"原始蓋歐卡",e:"Primal Kyogre"},{t:"超級巨沼怪",e:"Mega Swampert"},{t:"超級蜥蜴王",e:"Mega Sceptile"},{t:"紙御劍",e:"Kartana"},{t:"代拉基翁",e:"Terrakion"},{t:"巨金怪",e:"Metagross"},{t:"怪力",e:"Machamp"},{t:"修建老匠",e:"Conkeldurr"},{t:"巨沼怪",e:"Swampert"},{t:"路卡利歐",e:"Lucario"}], 
+                bad: [{t:"噴火龍",e:"Charizard"},{t:"波士可多拉",e:"Aggron"}]
+            },
+            "雷吉艾斯": {
+                en: "Regice", types: [{n:"冰",c:"type-ice"}], weaks: [{n:"火",c:"type-fire"},{n:"格鬥",c:"type-fighting"},{n:"岩石",c:"type-rock"}],
+                good: [{t:"超級噴火龍Y",e:"Mega Charizard Y"},{t:"超級火焰雞",e:"Mega Blaziken"},{t:"萊希拉姆",e:"Reshiram"},{t:"代拉基翁",e:"Terrakion"},{t:"巨金怪",e:"Metagross"},{t:"炎帝",e:"Entei"},{t:"鳳王",e:"Ho-Oh"},{t:"怪力",e:"Machamp"},{t:"路卡利歐",e:"Lucario"},{t:"修建老匠",e:"Conkeldurr"}], 
+                bad: [{t:"烈空坐",e:"Rayquaza"},{t:"土地雲",e:"Landorus"}]
+            },
+            "雷吉斯奇魯": {
+                en: "Registeel", types: [{n:"鋼",c:"type-steel"}], weaks: [{n:"火",c:"type-fire"},{n:"格鬥",c:"type-fighting"},{n:"地面",c:"type-ground"}],
+                good: [{t:"原始固拉多",e:"Primal Groudon"},{t:"超級噴火龍Y",e:"Mega Charizard Y"},{t:"萊希拉姆",e:"Reshiram"},{t:"代拉基翁",e:"Terrakion"},{t:"固拉多",e:"Groudon"},{t:"炎帝",e:"Entei"},{t:"鳳王",e:"Ho-Oh"},{t:"怪力",e:"Machamp"},{t:"路卡利歐",e:"Lucario"},{t:"修建老匠",e:"Conkeldurr"}], 
+                bad: [{t:"沙奈朵",e:"Gardevoir"},{t:"幸福蛋",e:"Blissey"}]
+            },
+            "席多藍恩": {
+                en: "Heatran", types: [{n:"火",c:"type-fire"},{n:"鋼",c:"type-steel"}], weaks: [{n:"地面",c:"type-ground"}],
+                good: [{t:"原始固拉多",e:"Primal Groudon"},{t:"超級烈咬陸鯊",e:"Mega Garchomp"},{t:"固拉多",e:"Groudon"},{t:"烈咬陸鯊",e:"Garchomp"},{t:"土地雲(靈獸)",e:"Landorus"},{t:"龍頭地鼠",e:"Excadrill"},{t:"超甲狂犀",e:"Rhyperior"},{t:"巨沼怪",e:"Swampert"},{t:"鑽角犀獸",e:"Rhydon"},{t:"頓甲",e:"Donphan"}], 
+                bad: [{t:"巨金怪",e:"Metagross"},{t:"妙蛙花",e:"Venusaur"}]
+            },
+            "土地雲 (靈獸)": {
+                en: "Landorus (Therian)", types: [{n:"地面",c:"type-ground"},{n:"飛行",c:"type-flying"}], weaks: [{n:"冰",c:"type-ice"}],
+                good: [{t:"超級冰鬼護",e:"Mega Glalie"},{t:"超級暴雪王",e:"Mega Abomasnow"},{t:"達摩狒狒(迦勒爾)",e:"Galarian Darmanitan"},{t:"象牙豬",e:"Mamoswine"},{t:"超夢(急凍光束)",e:"Mewtwo"},{t:"冰伊布",e:"Glaceon"},{t:"瑪狃拉",e:"Weavile"},{t:"冰雪巨龍",e:"Aurorus"},{t:"蓋歐卡",e:"Kyogre"},{t:"急凍鳥",e:"Articuno"}], 
+                bad: [{t:"雷公",e:"Raikou"},{t:"火爆猴",e:"Primeape"}]
+            },
+            "代歐奇希斯": {
+                en: "Deoxys", types: [{n:"超能力",c:"type-psychic"}], weaks: [{n:"惡",c:"type-dark"},{n:"幽靈",c:"type-ghost"}],
+                good: [{t:"超級班基拉斯",e:"Mega Tyranitar"},{t:"超級耿鬼",e:"Mega Gengar"},{t:"達克萊伊",e:"Darkrai"},{t:"騎拉帝納(起源)",e:"Giratina (Origin)"},{t:"三首惡龍",e:"Hydreigon"},{t:"水晶燈火靈",e:"Chandelure"},{t:"伊裴爾塔爾",e:"Yveltal"},{t:"超夢(暗影球)",e:"Mewtwo"},{t:"班基拉斯",e:"Tyranitar"},{t:"耿鬼",e:"Gengar"}], 
+                bad: [{t:"怪力",e:"Machamp"},{t:"波士可多拉",e:"Aggron"}]
+            },
+            "蓋諾賽克特": {
+                en: "Genesect", types: [{n:"蟲",c:"type-bug"},{n:"鋼",c:"type-steel"}], weaks: [{n:"火",c:"type-fire"}],
+                good: [{t:"超級噴火龍Y",e:"Mega Charizard Y"},{t:"超級噴火龍X",e:"Mega Charizard X"},{t:"超級火焰雞",e:"Mega Blaziken"},{t:"萊希拉姆",e:"Reshiram"},{t:"鳳王",e:"Ho-Oh"},{t:"達摩狒狒",e:"Darmanitan"},{t:"水晶燈火靈",e:"Chandelure"},{t:"炎帝",e:"Entei"},{t:"火焰鳥",e:"Moltres"},{t:"席多藍恩",e:"Heatran"}], 
+                bad: [{t:"椰蛋樹",e:"Exeggutor"},{t:"幸福蛋",e:"Blissey"}]
+            },
+            "卡璞・鳴鳴": {
+                en: "Tapu Koko", types: [{n:"電",c:"type-electric"},{n:"妖精",c:"type-fairy"}], weaks: [{n:"地面",c:"type-ground"},{n:"毒",c:"type-poison"}],
+                good: [{t:"原始固拉多",e:"Primal Groudon"},{t:"超級烈咬陸鯊",e:"Mega Garchomp"},{t:"固拉多",e:"Groudon"},{t:"烈咬陸鯊",e:"Garchomp"},{t:"龍頭地鼠",e:"Excadrill"},{t:"土地雲(靈獸)",e:"Landorus"},{t:"超甲狂犀",e:"Rhyperior"},{t:"象牙豬",e:"Mamoswine"},{t:"羅絲雷朵",e:"Roserade"},{t:"尼多王",e:"Nidoking"}], 
+                bad: [{t:"烈空坐",e:"Rayquaza"},{t:"暴鯉龍",e:"Gyarados"}]
+            },
+            "虛吾伊德": {
+                en: "Nihilego", types: [{n:"岩石",c:"type-rock"},{n:"毒",c:"type-poison"}], weaks: [{n:"地面",c:"type-ground"}],
+                good: [{t:"原始固拉多",e:"Primal Groudon"},{t:"超級烈咬陸鯊",e:"Mega Garchomp"},{t:"固拉多",e:"Groudon"},{t:"烈咬陸鯊",e:"Garchomp"},{t:"土地雲(靈獸)",e:"Landorus"},{t:"龍頭地鼠",e:"Excadrill"},{t:"超甲狂犀",e:"Rhyperior"},{t:"象牙豬",e:"Mamoswine"},{t:"泥偶巨人",e:"Golurk"},{t:"頓甲",e:"Donphan"}], 
+                bad: [{t:"噴火龍",e:"Charizard"},{t:"沙奈朵",e:"Gardevoir"}]
+            },
+            "惡食大王": {
+                en: "Guzzlord", types: [{n:"惡",c:"type-dark"},{n:"龍",c:"type-dragon"}], weaks: [{n:"妖精",c:"type-fairy"}],
+                good: [{t:"超級沙奈朵",e:"Mega Gardevoir"},{t:"超級蒂安希",e:"Mega Diancie"},{t:"波克基斯",e:"Togekiss"},{t:"沙奈朵",e:"Gardevoir"},{t:"哲爾尼亞斯",e:"Xerneas"},{t:"仙子伊布",e:"Sylveon"},{t:"布魯皇",e:"Granbull"},{t:"西獅海壬",e:"Primarina"},{t:"蒼響",e:"Zacian"},{t:"卡璞・蝶結",e:"Tapu Lele"}], 
+                bad: [{t:"耿鬼",e:"Gengar"},{t:"快龍",e:"Dragonite"}]
+            },
+            "拉帝亞斯 / 拉帝歐斯": {
+                en: "Latias / Latios", types: [{n:"龍",c:"type-dragon"},{n:"超能力",c:"type-psychic"}], weaks: [{n:"龍",c:"type-dragon"},{n:"惡",c:"type-dark"},{n:"幽靈",c:"type-ghost"}],
+                good: [{t:"超級烈空坐",e:"Mega Rayquaza"},{t:"超級暴飛龍",e:"Mega Salamence"},{t:"超級烈咬陸鯊",e:"Mega Garchomp"},{t:"烈空坐",e:"Rayquaza"},{t:"帕路奇亞",e:"Palkia"},{t:"暴飛龍",e:"Salamence"},{t:"烈咬陸鯊",e:"Garchomp"},{t:"帝牙盧卡",e:"Dialga"},{t:"捷克羅姆",e:"Zekrom"},{t:"達克萊伊",e:"Darkrai"}], 
+                bad: [{t:"怪力",e:"Machamp"},{t:"請假王",e:"Slaking"}]
+            },
+            "克雷色利亞": {
+                en: "Cresselia", types: [{n:"超能力",c:"type-psychic"}], weaks: [{n:"蟲",c:"type-bug"},{n:"幽靈",c:"type-ghost"},{n:"惡",c:"type-dark"}],
+                good: [{t:"超級班基拉斯",e:"Mega Tyranitar"},{t:"超級耿鬼",e:"Mega Gengar"},{t:"達克萊伊",e:"Darkrai"},{t:"騎拉帝納(起源)",e:"Giratina (Origin)"},{t:"三首惡龍",e:"Hydreigon"},{t:"水晶燈火靈",e:"Chandelure"},{t:"伊裴爾塔爾",e:"Yveltal"},{t:"瑪狃拉",e:"Weavile"},{t:"耿鬼",e:"Gengar"},{t:"班基拉斯",e:"Tyranitar"}], 
+                bad: [{t:"路卡利歐",e:"Lucario"},{t:"波士可多拉",e:"Aggron"}]
+            },
+            "達克萊伊": {
+                en: "Darkrai", types: [{n:"惡",c:"type-dark"}], weaks: [{n:"格鬥",c:"type-fighting"},{n:"妖精",c:"type-fairy"},{n:"蟲",c:"type-bug"}],
+                good: [{t:"超級路卡利歐",e:"Mega Lucario"},{t:"超級沙奈朵",e:"Mega Gardevoir"},{t:"代拉基翁",e:"Terrakion"},{t:"波克基斯",e:"Togekiss"},{t:"沙奈朵",e:"Gardevoir"},{t:"怪力",e:"Machamp"},{t:"修建老匠",e:"Conkeldurr"},{t:"哲爾尼亞斯",e:"Xerneas"},{t:"鐵掌力士",e:"Hariyama"},{t:"路卡利歐",e:"Lucario"}], 
+                bad: [{t:"超夢",e:"Mewtwo"},{t:"耿鬼",e:"Gengar"}]
+            },
+            "蒼響": {
+                en: "Zacian", types: [{n:"妖精",c:"type-fairy"}], weaks: [{n:"毒",c:"type-poison"},{n:"鋼",c:"type-steel"}],
+                good: [{t:"超級耿鬼",e:"Mega Gengar"},{t:"超級大針蜂",e:"Mega Beedrill"},{t:"巨金怪",e:"Metagross"},{t:"虛吾伊德",e:"Nihilego"},{t:"羅絲雷朵",e:"Roserade"},{t:"帝牙盧卡",e:"Dialga"},{t:"龍頭地鼠",e:"Excadrill"},{t:"毒骷蛙",e:"Toxicroak"},{t:"蓋諾賽克特",e:"Genesect"},{t:"巨鉗螳螂",e:"Scizor"}], 
+                bad: [{t:"怪力",e:"Machamp"},{t:"烈空坐",e:"Rayquaza"}]
+            }
+        };
+
+        const phases = {
+            'p1': {
+                hl: ["超級超夢 Y", "帝牙盧卡 (起源)", "帕路奇亞 (起源)"],
+                ot: ["雷吉洛克", "雷吉艾斯", "雷吉斯奇魯", "席多藍恩", "土地雲 (靈獸)"]
+            },
+            'p2': {
+                hl: ["超級超夢 Y", "奈克洛茲瑪", "電束木"],
+                ot: ["代歐奇希斯", "蓋諾賽克特", "卡璞・鳴鳴", "虛吾伊德", "惡食大王"]
+            },
+            'p3': {
+                hl: ["超級超夢 Y", "超級路卡利歐", "超級班基拉斯"],
+                ot: ["拉帝亞斯 / 拉帝歐斯", "克雷色利亞", "達克萊伊", "蒼響"]
+            }
+        };
+
+        // 3. 渲染主頁面
+        function render(pId) {
+            const d = phases[pId];
+            
+            let html = `<div class="section-title">⭐ 核心必打目標</div><div class="boss-grid">`;
+            d.hl.forEach(b => {
+                const info = db[b];
+                html += `<div class="boss-card highlight" onclick="openM('${b}')">
+                    <div class="boss-name">${b}</div><div class="boss-en">${info.en}</div>
+                    <div>${info.types.map(t=>`<span class="type-pill ${t.c}">${t.n}</span>`).join('')}</div>
+                </div>`;
+            });
+            html += `</div><div class="section-title" style="border-left-color:#666">⚔️ 其他陣容</div><div class="boss-grid others">`;
+            d.ot.forEach(b => {
+                const info = db[b];
+                html += `<div class="boss-card others" onclick="openM('${b}')">
+                    <div class="boss-name">${b}</div><div class="boss-en">${info.en}</div>
+                    <div>${info.types.map(t=>`<span class="type-pill ${t.c}">${t.n}</span>`).join('')}</div>
+                </div>`;
+            });
+            document.getElementById('content').innerHTML = html + `</div>`;
+        }
+
+        // 4. 切換與彈窗邏輯
+        function switchTab(pId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.className = 'nav-item');
+            const classMap = { 'p1': 'active-mystic', 'p2': 'active-valor', 'p3': 'active-instinct' };
+            document.getElementById('tab-' + pId).classList.add(classMap[pId]);
+            render(pId); document.getElementById('content').scrollTo(0, 0);
+        }
+
+        function openM(name) {
+            const info = db[name];
+            document.getElementById('m-title').textContent = name;
+            document.getElementById('m-en').textContent = info.en;
+            
+            document.getElementById('m-types').innerHTML = info.types.map(t=>`<span class="type-pill ${t.c}">${t.n}</span>`).join('');
+            document.getElementById('m-weaks').innerHTML = info.weaks.map(w=>`<span class="type-pill ${w.c}">${w.n}</span>`).join('');
+
+            document.getElementById('m-good-list').innerHTML = info.good.map(g=>
+                `<div class="poke-item"><div class="poke-tw">${g.t}</div><div class="poke-en">${g.e}</div></div>`
+            ).join('');
+            document.getElementById('m-bad-list').innerHTML = info.bad.map(b=>
+                `<div class="poke-item"><div class="poke-tw">${b.t}</div><div class="poke-en">${b.e}</div></div>`
+            ).join('');
+
+            document.getElementById('modal').classList.add('active');
+            document.querySelector('.modal-scroll-area').scrollTop = 0;
+        }
+
+        function closeModal(e) {
+            if (e === true || e.target.id === 'modal') {
+                document.getElementById('modal').classList.remove('active');
+            }
+        }
+
+        render('p1');
+    </script>
+</body>
+</html>
