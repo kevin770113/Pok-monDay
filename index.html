@@ -59,7 +59,9 @@
             background-color: var(--bg-card); border-radius: 12px;
             padding: 16px; border: 1px solid #333;
             cursor: pointer; position: relative; overflow: hidden;
+            transition: transform 0.1s;
         }
+        .boss-card:active { transform: scale(0.97); }
         
         .boss-card.highlight::before {
             content: '⭐ 絕對必打 / Must Do';
@@ -68,6 +70,17 @@
             padding: 4px 0; background: rgba(255,255,255,0.15);
         }
         .boss-card.highlight { padding-top: 30px; border-width: 2px; }
+
+        /* 🔥 新增：超夢專屬彩色呼吸燈動畫 */
+        @keyframes rainbow-breath {
+            0% { box-shadow: 0 0 10px rgba(255, 50, 100, 0.3); border-color: rgba(255, 50, 100, 0.6) !important; background-color: #241118; }
+            33% { box-shadow: 0 0 20px rgba(150, 50, 255, 0.6); border-color: rgba(150, 50, 255, 0.9) !important; background-color: #171124; }
+            66% { box-shadow: 0 0 20px rgba(50, 150, 255, 0.5); border-color: rgba(50, 150, 255, 0.8) !important; background-color: #111a24; }
+            100% { box-shadow: 0 0 10px rgba(255, 50, 100, 0.3); border-color: rgba(255, 50, 100, 0.6) !important; background-color: #241118; }
+        }
+        .mewtwo-glow {
+            animation: rainbow-breath 4s infinite alternate ease-in-out;
+        }
 
         .boss-name { font-size: 20px; font-weight: 900; line-height: 1.2; }
         .boss-en { font-size: 12px; color: #999; margin-bottom: 8px; }
@@ -121,15 +134,9 @@
             width: 36px; height: 36px; border-radius: 18px; font-size: 18px; font-weight: bold;
         }
 
-        .modal-scroll-area {
-            overflow-y: auto;
-            flex: 1;
-            padding-bottom: 30px;
-        }
+        .modal-scroll-area { overflow-y: auto; flex: 1; padding-bottom: 30px; }
 
-        .attr-container {
-            display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;
-        }
+        .attr-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .attr-box { padding: 12px; border-radius: 8px; }
         .attr-box.type { background: rgba(255,255,255,0.08); border-left: 5px solid #888; }
         .attr-box.weak { background: rgba(255, 51, 51, 0.15); border-left: 5px solid #FF3333; }
@@ -137,10 +144,7 @@
         .attr-title.type { color: #DDD; }
         .attr-title.weak { color: #FF5555; }
 
-        .split-view {
-            display: flex; gap: 10px; 
-            min-height: min-content;
-        }
+        .split-view { display: flex; gap: 10px; min-height: min-content; }
         .col { flex: 1; border-radius: 8px; padding: 10px; height: max-content; }
         .col-good { background: rgba(0, 200, 83, 0.1); border-top: 4px solid #00C853; }
         .col-bad { background: rgba(229, 57, 53, 0.1); border-top: 4px solid #E53935; }
@@ -163,12 +167,29 @@
             background: #111; display: flex;
             padding-bottom: var(--safe-bottom); border-top: 1px solid #333; z-index: 100;
         }
+
+        /* 🔥 新增：導覽列縮小 80% 與物理回彈動畫 */
         .nav-item {
             flex: 1; text-align: center; padding: 15px 0;
             color: #555; font-size: 15px; font-weight: 900;
-            transition: all 0.2s; border-top: 4px solid transparent;
+            border-top: 4px solid transparent;
+            /* 預設縮小至 80%、下沉並降低透明度 */
+            transform: scale(0.8) translateY(8px);
+            opacity: 0.6;
+            transform-origin: center bottom;
+            /* Cubic-bezier 提供原生 App 的絲滑 Q 彈感 */
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        opacity 0.4s ease, background-color 0.3s, border-color 0.3s;
         }
         .nav-time { font-size: 18px; font-weight: 900; display: block; margin-bottom: 4px; }
+
+        /* 啟動狀態：放大回 100% 並上浮 */
+        .nav-item.active-mystic, 
+        .nav-item.active-valor, 
+        .nav-item.active-instinct {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
 
         .nav-item.active-mystic { color: var(--mystic-blue); border-color: var(--mystic-blue); background: rgba(0,85,255,0.15); }
         .nav-item.active-valor { color: var(--valor-red); border-color: var(--valor-red); background: rgba(255,51,51,0.15); }
@@ -233,7 +254,7 @@
     </div>
 
     <script>
-        // 1. 動態時鐘與「頂部列底色自動變色」系統
+        // 1. 動態時鐘與背景變色
         function updateClock() {
             const now = new Date();
             const h = now.getHours();
@@ -245,22 +266,19 @@
                 String(m).padStart(2, '0') + ':' + 
                 String(s).padStart(2, '0');
 
-            // 判斷是否為週日活動日 (假設 7/26 日期，若平時測試可拔除日期限制，此處僅做簡易時段判斷)
-            // 這裡直接依據當前時間點自動變換頂部列底色
             const header = document.getElementById('top-header');
             
-            // 模擬：如果剛好在活動時間範圍內 (假設 10:00 ~ 19:00)
             if (h >= 10 && h < 13) {
-                header.style.backgroundColor = 'rgba(0, 85, 255, 0.35)'; // 藍色基調
+                header.style.backgroundColor = 'rgba(0, 85, 255, 0.35)'; 
                 header.style.borderColor = 'var(--mystic-blue)';
             } else if (h >= 13 && h < 16) {
-                header.style.backgroundColor = 'rgba(255, 51, 51, 0.35)'; // 紅色基調
+                header.style.backgroundColor = 'rgba(255, 51, 51, 0.35)'; 
                 header.style.borderColor = 'var(--valor-red)';
             } else if (h >= 16 && h < 19) {
-                header.style.backgroundColor = 'rgba(255, 204, 0, 0.35)'; // 黃色基調
+                header.style.backgroundColor = 'rgba(255, 204, 0, 0.35)'; 
                 header.style.borderColor = 'var(--instinct-yellow)';
             } else {
-                header.style.backgroundColor = 'rgba(18, 18, 18, 0.92)'; // 非活動時間為沉穩黑色
+                header.style.backgroundColor = 'rgba(18, 18, 18, 0.92)'; 
                 header.style.borderColor = '#444';
             }
         }
@@ -397,14 +415,17 @@
             }
         };
 
-        // 3. 渲染主頁面
+        // 3. 渲染頁面與超夢專屬特效綁定
         function render(pId) {
             const d = phases[pId];
             
             let html = `<div class="section-title">⭐ 核心必打目標</div><div class="boss-grid">`;
             d.hl.forEach(b => {
                 const info = db[b];
-                html += `<div class="boss-card highlight" onclick="openM('${b}')">
+                // 🔥 若為超級超夢 Y，則自動加上 mewtwo-glow 動畫 Class
+                const extraClass = (b === "超級超夢 Y") ? " mewtwo-glow" : "";
+                
+                html += `<div class="boss-card highlight${extraClass}" onclick="openM('${b}')">
                     <div class="boss-name">${b}</div><div class="boss-en">${info.en}</div>
                     <div>${info.types.map(t=>`<span class="type-pill ${t.c}">${t.n}</span>`).join('')}</div>
                 </div>`;
