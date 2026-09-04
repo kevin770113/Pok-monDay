@@ -7,11 +7,11 @@
     <style>
         :root {
             --bg-color: #0d0d0d;
-            --content-bg: #1a1a1a;
-            --time-color: #ffb74d; /* 柔和的亮橘色，不刺眼 */
-            --target-text: #00e676; /* 霓虹亮綠色，極度顯眼 */
-            --normal-text: #555555; /* 極度暗化非目標物 */
-            --text-main: #e0e0e0;
+            --time-color: #ffcc00; /* 時間條顏色 */
+            --raid-target: #ff5252; /* 團戰目標：亮橘紅 */
+            --wild-target: #00e676; /* 野外目標：螢光綠 */
+            --normal-text: #555555; /* 非重點：暗灰色 */
+            --text-main: #cccccc;
             --border-color: #333333;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -73,20 +73,20 @@
         /* 左側時間軸排版 */
         .timeline-item {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             align-items: stretch;
         }
         .time-col {
-            flex: 0 0 55px; /* 左側固定寬度 */
-            padding-top: 4px;
+            flex: 0 0 55px;
+            padding-top: 2px;
             text-align: right;
             padding-right: 12px;
             border-right: 2px solid var(--border-color);
         }
         .time-main {
             color: var(--time-color);
-            font-size: 1.1rem;
-            font-weight: 800;
+            font-size: 1.15rem;
+            font-weight: 900;
         }
         .time-sub {
             color: #666;
@@ -98,21 +98,20 @@
         .content-col {
             flex: 1;
             padding-left: 16px;
-            padding-bottom: 10px;
         }
         .theme-title {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: bold;
-            color: #aaa;
+            color: #aaaaaa;
             margin-bottom: 8px;
         }
         .section-label {
             font-size: 0.85rem;
-            color: #777;
             margin: 10px 0 4px;
-            display: flex;
-            align-items: center;
+            font-weight: bold;
         }
+        .label-raid { color: #d48282; } /* 團戰標題微紅色系 */
+        .label-wild { color: #82d49c; } /* 野外標題微綠色系 */
         
         /* 寶可夢清單文字樣式 */
         .item-list {
@@ -122,20 +121,22 @@
         .item { color: var(--normal-text); margin-right: 8px; }
         
         /* 目標亮眼文字 */
-        .item.target {
-            color: var(--target-text);
+        .item.raid-target {
+            color: var(--raid-target);
             font-weight: 900;
-            text-shadow: 0 0 1px var(--target-text);
+            text-shadow: 0 0 2px rgba(255,82,82,0.4);
+        }
+        .item.wild-target {
+            color: var(--wild-target);
+            font-weight: 900;
+            text-shadow: 0 0 2px rgba(0,230,118,0.4);
         }
         .note {
             display: block;
             font-size: 0.8rem;
-            color: #a0a0a0;
+            color: #888888;
             margin-top: 4px;
             line-height: 1.4;
-        }
-        .note.highlight {
-            color: var(--target-text);
         }
     </style>
 </head>
@@ -148,256 +149,326 @@
 
     <div class="container">
         
-        <!-- 9月5日 (週六) 行程 -->
+        <!-- ================= 9月5日 (週六) 行程 ================= -->
         <div id="day1" class="day-view active">
             <div class="allday-block">
                 <div class="allday-title">📌 全天候常駐 (10:00 - 18:00)</div>
-                <div class="section-label">⚔️ 團體戰</div>
+                <div class="section-label label-raid">⚔️ 極致超級團體戰</div>
                 <div class="item-list">
-                    <span class="item target">★ 超級超夢Ｘ</span>
-                    <span class="note highlight">※ 打滿圖鑑與爆裂拳+能量即收手</span>
+                    <span class="item raid-target">★ 超級超夢Ｘ</span>
                 </div>
-                <div class="section-label">🌿 野外</div>
+                <div class="note" style="color:var(--raid-target);">※ 能量滿即停手，開爆裂拳+與圖鑑。</div>
+                <div class="section-label label-wild" style="margin-top:12px;">🌿 全天地圖野外</div>
                 <div class="item-list">
-                    <span class="item target">★ 呱呱泡蛙</span>
-                    <span class="note">※ 沿途狂農 XL 糖果</span>
+                    <span class="item wild-target">★ 呱呱泡蛙</span>
                 </div>
             </div>
 
-            <!-- 時間軸區塊開始 (嚴格依時序) -->
+            <!-- 10:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">10<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 11:00</div>
+                    <div class="time-main">10<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 11:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title">茂盛藤蔓 (可休息)</div>
-                    <div class="section-label">⚔️ 團戰：</div>
+                    <div class="theme-title">茂盛藤蔓</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item">大針蜂</span><span class="item">大食花</span><span class="item">凱羅斯</span><span class="item">暴雪王</span>
+                        <span class="item">超級大針蜂</span><span class="item">超級大食花</span><span class="item">超級凱羅斯</span><span class="item">超級暴雪王</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">獨角蟲</span><span class="item">喇叭芽</span><span class="item">飛天螳螂</span><span class="item">凱羅斯</span><span class="item">毒薔薇</span><span class="item">雪笠怪</span><span class="item">百足蜈蚣</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">坐騎小羊</span>
                     </div>
                 </div>
             </div>
 
+            <!-- 11:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">11<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 12:00</div>
+                    <div class="time-main">11<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 12:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title">思緒運河 (可休息)</div>
-                    <div class="section-label">⚔️ 團戰：</div>
+                    <div class="theme-title">思緒運河</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item">胡地</span><span class="item">呆殼獸</span><span class="item">寶石海星</span><span class="item">恰雷姆</span>
+                        <span class="item">超級胡地</span><span class="item">超級呆殼獸</span><span class="item">超級寶石海星</span><span class="item">超級恰雷姆</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">凱西</span><span class="item">呆呆獸</span><span class="item">海星星</span><span class="item">拉魯拉絲</span><span class="item">瑪沙那</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">妙喵</span><span class="item">龜腳腳</span><span class="item">鐵臂槍蝦</span>
                     </div>
                 </div>
             </div>
 
+            <!-- 12:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">12<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 13:00</div>
+                    <div class="time-main">12<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 13:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title" style="color:var(--time-color);">昏暗小巷 ★ 綠券全砸時段</div>
-                    <div class="section-label">⚔️ 團戰：</div>
+                    <div class="theme-title" style="color:var(--time-color);">昏暗小巷 ★核心作戰</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item target">★ 超級耿鬼</span><span class="item">黑魯加</span><span class="item">詛咒娃娃</span><span class="item">烏賊王</span>
-                        <span class="note highlight">※ 狂刷15攻高IV與XL糖</span>
+                        <span class="item raid-target">★ 超級耿鬼</span><span class="item">超級黑魯加</span><span class="item">超級詛咒娃娃</span><span class="item">超級烏賊王</span>
                     </div>
-                    <div class="section-label">🌿 野外：</div>
+                    <div class="note" style="color:var(--raid-target);">※ 綠券全砸耿鬼！</div>
+                    <div class="section-label label-wild">🌿 野外：</div>
                     <div class="item-list">
-                        <span class="item target">★ 鬼斯</span><span class="item target">★ 燭光靈</span>
-                        <span class="item">戴魯比</span><span class="item">小木靈</span><span class="item">南瓜精</span><span class="item">怨影娃娃</span><span class="item">索羅亞</span><span class="item">好啦魷</span>
+                        <span class="item wild-target">★ 鬼斯</span><span class="item">戴魯比</span><span class="item">怨影娃娃</span><span class="item">索羅亞</span><span class="item wild-target">★ 燭光靈</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">好啦魷</span><span class="item">小木靈</span><span class="item">南瓜精</span>
                     </div>
                 </div>
             </div>
 
+            <!-- 13:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">13<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 14:00</div>
+                    <div class="time-main">13<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 14:00</div>
                 </div>
                 <div class="content-col">
                     <div class="theme-title">電光廣場</div>
-                    <div class="section-label">⚔️ 團戰：</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item">雷丘Ｘ (跳過)</span><span class="item">電龍</span><span class="item">雷電獸</span>
+                        <span class="item">超級雷丘Ｘ</span><span class="item">超級電龍</span><span class="item">超級雷電獸</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">皮卡丘</span><span class="item">咩利羊</span><span class="item">落雷獸</span><span class="item">電飛鼠</span><span class="item">麻麻小魚</span><span class="item">泥巴魚</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">傘電蜥</span><span class="item">咚咚鼠</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 下午時段重複 -->
+            <!-- 14:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">14<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 15:00</div>
-                </div>
-                <div class="content-col"><div class="theme-title">茂盛藤蔓 (可休息)</div></div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="time-col">
-                    <div class="time-main">15<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 16:00</div>
-                </div>
-                <div class="content-col"><div class="theme-title">思緒運河 (可休息)</div></div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="time-col">
-                    <div class="time-main">16<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 17:00</div>
+                    <div class="time-main">14<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 15:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title" style="color:var(--time-color);">昏暗小巷 ★ 綠券全砸時段</div>
-                    <div class="section-label">⚔️ 團戰：</div>
+                    <div class="theme-title">茂盛藤蔓</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item target">★ 超級耿鬼</span><span class="item">黑魯加</span><span class="item">詛咒娃娃</span>
+                        <span class="item">超級大針蜂</span><span class="item">超級大食花</span><span class="item">超級凱羅斯</span><span class="item">超級暴雪王</span>
                     </div>
-                    <div class="section-label">🌿 野外：</div>
+                    <div class="section-label label-wild">🌿 野外：</div>
                     <div class="item-list">
-                        <span class="item target">★ 鬼斯</span><span class="item target">★ 燭光靈</span><span class="item">其餘略過</span>
+                        <span class="item">獨角蟲</span><span class="item">喇叭芽</span><span class="item">飛天螳螂</span><span class="item">凱羅斯</span><span class="item">毒薔薇</span><span class="item">雪笠怪</span><span class="item">百足蜈蚣</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">坐騎小羊</span>
                     </div>
                 </div>
             </div>
 
+            <!-- 15:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">17<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 18:00</div>
+                    <div class="time-main">15<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 16:00</div>
                 </div>
-                <div class="content-col"><div class="theme-title">電光廣場 (可休息)</div></div>
+                <div class="content-col">
+                    <div class="theme-title">思緒運河</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
+                    <div class="item-list">
+                        <span class="item">超級胡地</span><span class="item">超級呆殼獸</span><span class="item">超級寶石海星</span><span class="item">超級恰雷姆</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">凱西</span><span class="item">呆呆獸</span><span class="item">海星星</span><span class="item">拉魯拉絲</span><span class="item">瑪沙那</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">妙喵</span><span class="item">龜腳腳</span><span class="item">鐵臂槍蝦</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 16:00 -->
+            <div class="timeline-item">
+                <div class="time-col">
+                    <div class="time-main">16<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 17:00</div>
+                </div>
+                <div class="content-col">
+                    <div class="theme-title" style="color:var(--time-color);">昏暗小巷 ★核心作戰</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
+                    <div class="item-list">
+                        <span class="item raid-target">★ 超級耿鬼</span><span class="item">超級黑魯加</span><span class="item">超級詛咒娃娃</span><span class="item">超級烏賊王</span>
+                    </div>
+                    <div class="note" style="color:var(--raid-target);">※ 綠券全砸耿鬼！</div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item wild-target">★ 鬼斯</span><span class="item">戴魯比</span><span class="item">怨影娃娃</span><span class="item">索羅亞</span><span class="item wild-target">★ 燭光靈</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">好啦魷</span><span class="item">小木靈</span><span class="item">南瓜精</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 17:00 -->
+            <div class="timeline-item">
+                <div class="time-col">
+                    <div class="time-main">17<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 18:00</div>
+                </div>
+                <div class="content-col">
+                    <div class="theme-title">電光廣場</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
+                    <div class="item-list">
+                        <span class="item">超級雷丘Ｘ</span><span class="item">超級電龍</span><span class="item">超級雷電獸</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">皮卡丘</span><span class="item">咩利羊</span><span class="item">落雷獸</span><span class="item">電飛鼠</span><span class="item">麻麻小魚</span><span class="item">泥巴魚</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">傘電蜥</span><span class="item">咚咚鼠</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-
-        <!-- 9月6日 (週日) 行程 -->
+        <!-- ================= 9月6日 (週日) 行程 ================= -->
         <div id="day2" class="day-view">
             <div class="allday-block">
                 <div class="allday-title">📌 全天候常駐 (10:00 - 18:00)</div>
-                <div class="section-label">⚔️ 團體戰 (今日綠券消耗: 0)</div>
+                <div class="section-label label-raid">⚔️ 極致超級團體戰</div>
                 <div class="item-list">
-                    <span class="item">超夢Ｙ (已有完美個體，完全略過)</span>
+                    <span class="item">超級超夢Ｙ</span>
                 </div>
-                <div class="section-label">🌿 野外</div>
+                <div class="note">※ 今日綠券消耗：0 (已有完美超夢Y)。</div>
+                <div class="section-label label-wild" style="margin-top:12px;">🌿 全天地圖野外</div>
                 <div class="item-list">
-                    <span class="item target">★ 呱呱泡蛙</span>
-                    <span class="note">※ 繼續收割 XL 糖果</span>
+                    <span class="item wild-target">★ 呱呱泡蛙</span>
                 </div>
             </div>
 
-            <!-- 時間軸區塊開始 (嚴格依時序) -->
+            <!-- 10:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">10<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 11:00</div>
+                    <div class="time-main">10<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 11:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title" style="color:var(--time-color);">雪之礦山 ★ 戰略物資收割</div>
-                    <div class="section-label">⚔️ 團戰：(全略過)</div>
+                    <div class="theme-title" style="color:var(--time-color);">雪之礦山 ★戰略物資</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item">大鋼蛇</span><span class="item">盔甲鳥</span><span class="item">波士可多拉</span><span class="item">冰鬼護</span>
+                        <span class="item">超級大鋼蛇</span><span class="item">超級盔甲鳥</span><span class="item">超級波士可多拉</span><span class="item">超級冰鬼護</span>
                     </div>
-                    <div class="section-label">🌿 野外：</div>
+                    <div class="section-label label-wild">🌿 野外：</div>
                     <div class="item-list">
-                        <span class="item target">★ 鐵啞鈴</span><span class="item target">★ 螺釘地鼠</span>
-                        <span class="item">大岩蛇</span><span class="item">盔甲鳥</span><span class="item">可可多拉</span><span class="item">雪童子</span><span class="item">冰雪龍</span><span class="item">冰寶</span>
-                        <span class="note highlight">※ 黑球全砸鐵啞鈴！農滿 296 XL 糖</span>
+                        <span class="item">大岩蛇</span><span class="item">盔甲鳥</span><span class="item">可可多拉</span><span class="item">雪童子</span><span class="item wild-target">★ 鐵啞鈴</span><span class="item wild-target">★ 螺釘地鼠</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">冰雪龍</span><span class="item">冰寶</span>
                     </div>
+                    <div class="note" style="color:var(--wild-target);">※ 黑球全砸鐵啞鈴！農滿 XL 糖。</div>
                 </div>
             </div>
 
+            <!-- 11:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">11<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 12:00</div>
+                    <div class="time-main">11<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 12:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title">對戰地帶 (可休息)</div>
-                    <div class="section-label">⚔️ 團戰：(全略過)</div>
+                    <div class="theme-title">對戰地帶</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item">巨牙鯊</span><span class="item">噴火駝</span><span class="item">長耳兔</span><span class="item">列陣兵</span>
+                        <span class="item">超級巨牙鯊</span><span class="item">超級噴火駝</span><span class="item">超級長耳兔</span><span class="item">超級列陣兵</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">腕力</span><span class="item">利牙魚</span><span class="item">呆火駝</span><span class="item">捲捲耳</span><span class="item">黑眼鱷</span><span class="item">滑滑小子</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">頑皮熊貓</span><span class="item">列陣兵</span>
                     </div>
                 </div>
             </div>
 
+            <!-- 12:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">12<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 13:00</div>
+                    <div class="time-main">12<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 13:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title">天空居所 (可休息)</div>
-                    <div class="section-label">⚔️ 團戰：(全略過)</div>
+                    <div class="theme-title">天空居所</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item">暴鯉龍</span><span class="item">化石翼龍</span><span class="item">快龍</span><span class="item">七夕青鳥</span>
+                        <span class="item">超級暴鯉龍</span><span class="item">超級化石翼龍</span><span class="item">超級快龍</span><span class="item">超級七夕青鳥</span>
                     </div>
-                    <div class="section-label">🌿 野外：(全略過)</div>
+                    <div class="section-label label-wild">🌿 野外：</div>
                     <div class="item-list">
-                        <span class="item">迷你龍與寶貝龍已養起，跳過。</span>
+                        <span class="item">鯉魚王</span><span class="item">化石翼龍</span><span class="item">迷你龍</span><span class="item">青綿鳥</span><span class="item">寶貝龍</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">小箭雀</span><span class="item">寶寶暴龍</span><span class="item">嗡蝠</span>
                     </div>
                 </div>
             </div>
 
+            <!-- 13:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">13<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 14:00</div>
+                    <div class="time-main">13<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 14:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title" style="color:var(--time-color);">稜鏡街道 ★ 星沙提款機</div>
-                    <div class="section-label">⚔️ 團戰：(全略過)</div>
+                    <div class="theme-title" style="color:var(--time-color);">稜鏡街道 ★星沙提款機</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
                     <div class="item-list">
-                        <span class="item">雷丘Ｙ</span><span class="item">勾魂眼</span><span class="item">大嘴娃</span><span class="item">差不多娃娃</span>
+                        <span class="item">超級雷丘Ｙ</span><span class="item">超級勾魂眼</span><span class="item">超級大嘴娃</span><span class="item">超級差不多娃娃</span>
                     </div>
-                    <div class="section-label">🌿 野外：</div>
+                    <div class="section-label label-wild">🌿 野外：</div>
                     <div class="item-list">
-                        <span class="item target">★ 差不多娃娃 (2100沙)</span><span class="item target">★ 勾魂眼 (750沙)</span>
-                        <span class="item">皮卡丘</span><span class="item">皮皮</span><span class="item">大嘴娃</span><span class="item">多麗米亞</span><span class="item">粉香香</span><span class="item">小碎鑽</span>
-                        <span class="note highlight">※ 開星星碎片！極速回血星沙庫存</span>
+                        <span class="item">皮卡丘</span><span class="item">皮皮</span><span class="item wild-target">★ 勾魂眼</span><span class="item">大嘴娃</span><span class="item wild-target">★ 差不多娃娃</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">多麗米亞</span><span class="item">粉香香</span><span class="item">小碎鑽</span>
                     </div>
+                    <div class="note" style="color:var(--wild-target);">※ 開星星碎片！狂刷差不多娃娃與勾魂眼。</div>
                 </div>
             </div>
 
-            <!-- 下午時段重複 -->
+            <!-- 14:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">14<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 15:00</div>
+                    <div class="time-main">14<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 15:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title" style="color:var(--time-color);">雪之礦山 ★ 繼續農鐵啞鈴</div>
-                    <div class="section-label">🌿 野外重點：</div>
-                    <div class="item-list"><span class="item target">★ 鐵啞鈴</span><span class="item target">★ 螺釘地鼠</span></div>
+                    <div class="theme-title" style="color:var(--time-color);">雪之礦山 ★戰略物資</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
+                    <div class="item-list">
+                        <span class="item">超級大鋼蛇</span><span class="item">超級盔甲鳥</span><span class="item">超級波士可多拉</span><span class="item">超級冰鬼護</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">大岩蛇</span><span class="item">盔甲鳥</span><span class="item">可可多拉</span><span class="item">雪童子</span><span class="item wild-target">★ 鐵啞鈴</span><span class="item wild-target">★ 螺釘地鼠</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">冰雪龍</span><span class="item">冰寶</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- 15:00 -->
             <div class="timeline-item">
                 <div class="time-col">
-                    <div class="time-main">15<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 16:00</div>
-                </div>
-                <div class="content-col"><div class="theme-title">對戰地帶 (可休息)</div></div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="time-col">
-                    <div class="time-main">16<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 17:00</div>
-                </div>
-                <div class="content-col"><div class="theme-title">天空居所 (可休息)</div></div>
-            </div>
-
-            <div class="timeline-item">
-                <div class="time-col">
-                    <div class="time-main">17<span style="font-size:0.8rem">:00</span></div>
-                    <div class="time-sub">| 18:00</div>
+                    <div class="time-main">15<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 16:00</div>
                 </div>
                 <div class="content-col">
-                    <div class="theme-title" style="color:var(--time-color);">稜鏡街道 ★ 最後刷星沙</div>
-                    <div class="section-label">🌿 野外重點：</div>
-                    <div class="item-list"><span class="item target">★ 差不多娃娃</span><span class="item target">★ 勾魂眼</span></div>
+                    <div class="theme-title">對戰地帶</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
+                    <div class="item-list">
+                        <span class="item">超級巨牙鯊</span><span class="item">超級噴火駝</span><span class="item">超級長耳兔</span><span class="item">超級列陣兵</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">腕力</span><span class="item">利牙魚</span><span class="item">呆火駝</span><span class="item">捲捲耳</span><span class="item">黑眼鱷</span><span class="item">滑滑小子</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">頑皮熊貓</span><span class="item">列陣兵</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 16:00 -->
+            <div class="timeline-item">
+                <div class="time-col">
+                    <div class="time-main">16<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 17:00</div>
+                </div>
+                <div class="content-col">
+                    <div class="theme-title">天空居所</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
+                    <div class="item-list">
+                        <span class="item">超級暴鯉龍</span><span class="item">超級化石翼龍</span><span class="item">超級快龍</span><span class="item">超級七夕青鳥</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">鯉魚王</span><span class="item">化石翼龍</span><span class="item">迷你龍</span><span class="item">青綿鳥</span><span class="item">寶貝龍</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">小箭雀</span><span class="item">寶寶暴暴龍</span><span class="item">嗡蝠</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 17:00 -->
+            <div class="timeline-item">
+                <div class="time-col">
+                    <div class="time-main">17<span style="font-size:0.8rem">:00</span></div><div class="time-sub">| 18:00</div>
+                </div>
+                <div class="content-col">
+                    <div class="theme-title" style="color:var(--time-color);">稜鏡街道 ★星沙提款機</div>
+                    <div class="section-label label-raid">⚔️ 團戰：</div>
+                    <div class="item-list">
+                        <span class="item">超級雷丘Ｙ</span><span class="item">超級勾魂眼</span><span class="item">超級大嘴娃</span><span class="item">超級差不多娃娃</span>
+                    </div>
+                    <div class="section-label label-wild">🌿 野外：</div>
+                    <div class="item-list">
+                        <span class="item">皮卡丘</span><span class="item">皮皮</span><span class="item wild-target">★ 勾魂眼</span><span class="item">大嘴娃</span><span class="item wild-target">★ 差不多娃娃</span><span class="item">哈力栗</span><span class="item">火狐狸</span><span class="item wild-target">★ 呱呱泡蛙</span><span class="item">多麗米亞</span><span class="item">粉香香</span><span class="item">小碎鑽</span>
+                    </div>
                 </div>
             </div>
         </div>
